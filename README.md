@@ -1047,4 +1047,5 @@ Before deploying or committing changes to `backend-fastapi`, verify the followin
 - [ ] **Error Handling**: Missing files return HTTP 400; validation errors return HTTP 422; internal model failures return HTTP 500.
 "# templates" 
 #   t e m p l a t e s  
+ #   t e m p l a t e s  
  
