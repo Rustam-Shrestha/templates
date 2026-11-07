@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: apps/backend/Dockerfile
+    container_name: erp_backend
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_WRITE_URL: postgresql://erp_user:erp_pass@pgbouncer:5432/erp_db
+      DATABASE_READ_URL: postgresql://erp_user:erp_pass@pgbouncer:5432/erp_db
+      REDIS_URL: redis://redis:6379
+      TRUST_PROXY_HOPS: 0
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
+    ports:
+      - "4000:4000"
+
+  worker:
+    build:
+      context: ..
+      dockerfile: apps/backend/Dockerfile
+    container_name: erp_outbox_worker
+    command: ["node", "apps/backend/dist/worker.js"]
+    environment:
+      NODE_ENV: production
+      DATABASE_WRITE_URL: postgresql://erp_user:erp_pass@pgbouncer:5432/erp_db
+      REDIS_URL: redis://redis:6379
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: apps/frontend/Dockerfile
+    container_name: erp_frontend
+    environment:
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+    ports:
+      - "3000:3000"
+

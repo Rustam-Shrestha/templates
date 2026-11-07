@@ -1,0 +1,72 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: erp_user
+          POSTGRES_PASSWORD: erp_pass
+          POSTGRES_DB: erp_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.14.0
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Lint Verification
+        run: pnpm run lint
+
+      - name: TypeScript Typecheck
+        run: pnpm run typecheck
+
+      - name: Execute Test Suite
+        env:
+          DATABASE_WRITE_URL: postgresql://erp_user:erp_pass@localhost:5432/erp_db
+          DATABASE_READ_URL: postgresql://erp_user:erp_pass@localhost:5432/erp_db
+          REDIS_URL: redis://localhost:6379
+          NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+        run: pnpm run test
+
+      - name: Monorepo Build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+        run: pnpm run build
+
