@@ -9,7 +9,8 @@ export default tseslint.config(
       "**/node_modules/**",
       "**/coverage/**",
       "**/.turbo/**",
-      "**/drizzle/**"
+      "**/drizzle/**",
+      "**/next-env.d.ts"
     ]
   },
   js.configs.recommended,

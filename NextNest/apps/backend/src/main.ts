@@ -4,7 +4,9 @@ import { FastifyAdapter, type NestFastifyApplication } from "@nestjs/platform-fa
 import type { FastifyRequest } from "fastify";
 import { VersioningType } from "@nestjs/common";
 import helmet from "@fastify/helmet";
+import multipart from "@fastify/multipart";
 import rateLimit from "@fastify/rate-limit";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module.js";
 import { getEnv } from "./core/config/env.schema.js";
 import { Rfc7807ExceptionFilter } from "./core/resilience/rfc7807-exception.filter.js";
@@ -53,6 +55,25 @@ async function bootstrap(): Promise<void> {
 
   app.useGlobalFilters(new Rfc7807ExceptionFilter());
   app.enableShutdownHooks();
+
+  // File upload support via Fastify multipart (10MB limit)
+  await app.register(multipart as unknown as RegisterPlugin, {
+    limits: {
+      fileSize: 10 * 1024 * 1024
+    }
+  });
+
+  // OpenAPI / Swagger Documentation
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle("NextNest Enterprise API")
+    .setDescription("High-performance ERP, Lending & Ledger Core API")
+    .setVersion("1.0.0")
+    .addBearerAuth()
+    .addApiKey({ type: "apiKey", name: "Idempotency-Key", in: "header" }, "idempotency-key")
+    .build();
+
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup("api/docs", app, swaggerDocument);
 
   // §7 Graceful shutdown with 10s force-exit timeout
   const handleShutdown = (): void => {

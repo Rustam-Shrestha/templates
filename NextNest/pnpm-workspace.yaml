@@ -8,5 +8,6 @@ minimumReleaseAgeExclude:
   - bullmq@6.7.0
 
 allowBuilds:
+  '@scarf/scarf': true
   esbuild: true
   msgpackr-extract: true
