@@ -17,6 +17,7 @@ Zero-to-production enterprise monorepo built with:
 - **Idempotency State Machine:** Composite `(scope, key)` tracking in PostgreSQL with SHA-256 canonical body hashing.
 - **Keyset Pagination:** $O(\log N)$ cursor pagination utilizing time-ordered RFC 9562 UUIDv7 IDs.
 - **Feature-Sliced Design (FSD):** Strict layer isolation in `apps/frontend`.
+- **Contribution & Modularity Standards:** Complete guide in [ARCHITECTURE_AND_CONTRIBUTING.md](ARCHITECTURE_AND_CONTRIBUTING.md).
 
 ## Architectural Decision Records (ADRs)
 - [ADR 0001: Core Architecture & Technology Stack Decisions](docs/adr/0001-stack-decisions.md)
