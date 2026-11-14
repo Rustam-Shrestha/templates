@@ -5,3 +5,4 @@ export * from './apiClient';
 export * from './exportData';
 export * from './constants';
 export * from './env';
+export * from './bs-calendar';
